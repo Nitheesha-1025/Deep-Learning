@@ -179,6 +179,13 @@ class Perceptron:
               print("Misclassified:", errors)
               print("Weights:", self.weights)
               print("Bias:", self.bias)
+              if hasattr(self, "training_inputs"):
+                      plot_decision_boundary(
+                          self,
+                          self.training_inputs,
+                          self.training_outputs,
+                          f"Epoch {epoch+1}"
+                      )
               print("\n\n")
               self.error_history.append(errors)
               self.weight_history.append(self.weights.copy())
@@ -195,12 +202,67 @@ class Perceptron:
                predictions.append(step_func(value))
 
         return np.array(predictions)
+def plot_decision_boundary(model, X, y, title):
+
+    plt.figure(figsize=(6,5))
+
+    # Plot points
+    for label in np.unique(y):
+        plt.scatter(
+            X[y==label][:,0],
+            X[y==label][:,1],
+            label=f"Class {label}",
+            s=100
+        )
+
+    w = model.weights
+    b = model.bias
+
+    x_values = np.linspace(-0.5,1.5,100)
+
+    if w[1] != 0:
+
+          y_values = -(w[0]*x_values + b)/w[1]
+
+          plt.plot(
+              x_values,
+              y_values,
+              color='red',
+              linewidth=2,
+              label="Decision Boundary"
+          )
+
+    else:
+
+          x_boundary = -b / w[0]
+
+          plt.axvline(
+              x=x_boundary,
+              color='red',
+              linewidth=2,
+              label="Decision Boundary"
+          )
+
+    plt.xlim(-0.5,1.5)
+    plt.ylim(-0.5,1.5)
+
+    plt.xlabel("Input 1")
+    plt.ylabel("Input 2")
+
+    plt.title(title)
+
+    plt.grid(True)
+
+    plt.legend()
+
+    plt.show()
 
 model = Perceptron(
     learning_rate=0.01,
     epochs=20
 )
-
+model.training_inputs = X_train
+model.training_outputs = y_train
 model.fit(X_train, y_train)
 
 #plotting training error for each epoch
@@ -341,7 +403,81 @@ print(f"F1-Score  : {f1:.4f}")
 print("\nConfusion Matrix:")
 print(cm)
 
+print("="*60)
+print("AND GATE")
+print("="*60)
 
+X_and = np.array([
+    [0,0],
+    [0,1],
+    [1,0],
+    [1,1]
+])
+
+y_and = np.array([0,0,0,1])
+
+and_model = Perceptron(
+    learning_rate=0.1,
+    epochs=10
+)
+
+and_model.training_inputs = X_and
+and_model.training_outputs = y_and
+
+and_model.fit(X_and,y_and)
+
+print("Predictions")
+print(and_model.predict(X_and))
+
+print("="*60)
+print("OR GATE")
+print("="*60)
+
+X_or = np.array([
+    [0,0],
+    [0,1],
+    [1,0],
+    [1,1]
+])
+
+y_or = np.array([0,1,1,1])
+
+or_model = Perceptron(
+    learning_rate=0.1,
+    epochs=10
+)
+
+or_model.training_inputs = X_or
+or_model.training_outputs = y_or
+
+or_model.fit(X_or,y_or)
+
+print("Predictions")
+print(or_model.predict(X_or))
+
+print("="*60)
+print("NOT GATE")
+print("="*60)
+
+X_not = np.array([
+    [0,0],
+    [1,0]
+])
+
+y_not = np.array([1,0])
+
+not_model = Perceptron(
+    learning_rate=0.1,
+    epochs=10
+)
+
+not_model.training_inputs = X_not
+not_model.training_outputs = y_not
+
+not_model.fit(X_not,y_not)
+
+print("Predictions")
+print(not_model.predict(X_not))
 
 
 
